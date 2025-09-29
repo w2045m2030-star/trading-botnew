@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // === 1️⃣ إعدادات بوت التليجرام ===
-const TELEGRAM_BOT_TOKEN = '8492077880:AAFO6r_G-bWcpGrY2R49Iyz5V-jDQuTyTXM'; // ضع آخر Token للبوت هنا
+const TELEGRAM_BOT_TOKEN = '8492077880:AAFO6r_G-bWcpGrY2R49Iyz5V-jDQuTyTXM'; // ضع توكن البوت هنا
 const CHAT_ID = '8080222077';
 
 // === 2️⃣ Middleware لتحليل JSON ===
@@ -19,14 +19,22 @@ let isSending = false;
 app.post('/webhook', (req, res) => {
   const data = req.body;
 
-  // تنسيق الرسالة بطريقة واضحة
+  // تحويل placeholders إلى قيم فعلية
+  const actionMap = {
+    "buy": "شراء",
+    "sell": "بيع",
+    "close": "إغلاق"
+  };
+  const action = actionMap[(data.action || "").toLowerCase()] || "غير محدد";
+
   const message = `
 📢 إشارة جديدة من TradingView:
 🔹 الزوج: ${data.symbol || 'N/A'}
-🔹 العملية: ${data.action || 'N/A'}
+🔹 العملية: ${action}
 🔹 السعر: ${data.price || 'N/A'}
-🔹 TP: ${data.tp || 'N/A'}
-🔹 SL: ${data.sl || 'N/A'}
+🔹 TP: ${data.tp || 'غير محدد'}
+🔹 SL: ${data.sl || 'غير محدد'}
+🔹 حجم اللوت المقترح: ${data.lot || 'غير محدد'}
 `;
 
   console.log("وصلت إشارة جديدة:", message.trim());
